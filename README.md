@@ -1,7 +1,5 @@
-Skilltest
+Codingtest
 =========
-
-Level: Junior
 
 Time: ~30minutes
 
