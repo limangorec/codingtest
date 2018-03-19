@@ -1,7 +1,10 @@
 Codingtest
 =========
 
-Time: ~30minutes
+### Setup
+System requirements:
+- PHP 5.6
+- Composer
 
 ### Intro
 Hi and welcome to limango! You're now going to participate in
