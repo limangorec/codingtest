@@ -3,7 +3,7 @@
 namespace App\Machine;
 
 /**
- * Interface PurchasableItemInterface
+ * Interface PurchaseTransactionInterface
  * @package App\Machine
  */
 interface PurchaseTransactionInterface

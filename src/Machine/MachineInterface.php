@@ -3,7 +3,7 @@
 namespace App\Machine;
 
 /**
- * Interface CigaretteMachine
+ * Interface MachineInterface
  * @package App\Machine
  */
 interface MachineInterface
