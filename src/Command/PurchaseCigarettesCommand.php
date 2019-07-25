@@ -8,6 +8,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use App\Machine;
+
 /**
  * Class CigaretteMachine
  * @package App\Command
@@ -34,21 +36,22 @@ class PurchaseCigarettesCommand extends Command
         $itemCount = (int) $input->getArgument('packs');
         $amount = (float) \str_replace(',', '.', $input->getArgument('amount'));
 
+        if ($amount < $itemCount * Machine\CigaretteMachine::ITEM_PRICE) {
+            $output->writeln($amount . ' is not enough money to pay for ' . $itemCount . ' packs of cigarettes');
+            exit;
+        }
 
-        // $cigaretteMachine = new CigaretteMachine();
-        // ...
+        $cigaretteMachine = new Machine\CigaretteMachine();
+        $cigarettePurchaseTransaction = new Machine\CigarettePurchaseTransaction($itemCount, $amount);
+        $purchaseCigarette = $cigaretteMachine->execute($cigarettePurchaseTransaction);
 
-        $output->writeln('You bought <info>...</info> packs of cigarettes for <info>...</info>, each for <info>...</info>. ');
+        $output->writeln('You bought <info>'.$purchaseCigarette->getItemQuantity().'</info> packs of cigarettes for <info>'.$purchaseCigarette->getTotalAmount().'</info>, each for <info>'.$cigaretteMachine::ITEM_PRICE.'</info>. ');
         $output->writeln('Your change is:');
 
         $table = new Table($output);
         $table
             ->setHeaders(array('Coins', 'Count'))
-            ->setRows(array(
-                // ...
-                array('0.02', '0'),
-                array('0.01', '0'),
-            ))
+            ->setRows($purchaseCigarette->getChange())
         ;
         $table->render();
 
