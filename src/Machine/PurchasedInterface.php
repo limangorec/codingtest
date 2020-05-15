@@ -3,15 +3,20 @@
 namespace App\Machine;
 
 /**
- * Interface PurchasedItemInterface
+ * Interface PurchasedInterface
  * @package App\Machine
  */
-interface PurchasedItemInterface
+interface PurchasedInterface
 {
     /**
      * @return integer
      */
     public function getItemQuantity();
+
+    /**
+     * @return float
+     */
+    public function getTotalLeft();
 
     /**
      * @return float

@@ -11,7 +11,7 @@ interface MachineInterface
     /**
      * @param PurchaseTransactionInterface $purchaseTransaction
      *
-     * @return PurchasedItemInterface
+     * @return PurchasedInterface
      */
     public function execute(PurchaseTransactionInterface $purchaseTransaction);
 }

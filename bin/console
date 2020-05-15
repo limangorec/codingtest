@@ -1,13 +1,16 @@
 #!/usr/bin/env php
 <?php
-// application.php
 
 require __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
+use \App\Command\PurchaseCigarettesCommand;
+use App\Machine\CigaretteMachineService;
+use \App\Machine\CigaretteMachine;
 
 $application = new Application();
 
-$application->add(new \App\Command\PurchaseCigarettesCommand("purchase-cigarettes"));
+$purchaseCigarettesCommand = new PurchaseCigarettesCommand(new CigaretteMachineService(new CigaretteMachine()));
+$application->add($purchaseCigarettesCommand);
 
 $application->run();
