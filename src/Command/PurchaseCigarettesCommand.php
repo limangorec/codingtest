@@ -2,14 +2,17 @@
 
 namespace App\Command;
 
+use App\Machine\CigaretteMachine;
+use App\Transaction\PurchaseTransaction;
+use App\Helper\EuroCoinTable;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class CigaretteMachine
+ *
  * @package App\Command
  */
 class PurchaseCigarettesCommand extends Command
@@ -24,7 +27,7 @@ class PurchaseCigarettesCommand extends Command
     }
 
     /**
-     * @param InputInterface   $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return int|null|void
@@ -34,23 +37,37 @@ class PurchaseCigarettesCommand extends Command
         $itemCount = (int) $input->getArgument('packs');
         $amount = (float) \str_replace(',', '.', $input->getArgument('amount'));
 
+        try {
+            $purchaseTransaction = new PurchaseTransaction($itemCount, $amount);
+        } catch (\InvalidArgumentException $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+            return 1;
+        }
 
-        // $cigaretteMachine = new CigaretteMachine();
-        // ...
+        $cigaretteMachine = new CigaretteMachine();
 
-        $output->writeln('You bought <info>...</info> packs of cigarettes for <info>...</info>, each for <info>...</info>. ');
-        $output->writeln('Your change is:');
+        try {
+            $purchasedTransaction = $cigaretteMachine->execute($purchaseTransaction);
+        } catch (\Exception $e) {
+            $output->writeln($e->getMessage());
+            return 1;
+        }
 
-        $table = new Table($output);
-        $table
-            ->setHeaders(array('Coins', 'Count'))
-            ->setRows(array(
-                // ...
-                array('0.02', '0'),
-                array('0.01', '0'),
-            ))
-        ;
-        $table->render();
+        $output->writeln(
+            sprintf(
 
+                'You bought <info>%s</info> packs of cigarettes for <info>%s</info>, each for <info>%s</info>. ',
+                $purchasedTransaction->getItemQuantity(),
+                $purchasedTransaction->getTotalAmount(),
+                CigaretteMachine::ITEM_PRICE
+            )
+        );
+
+        if ($purchasedTransaction->getChange()) {
+            $output->writeln('Your change is:');
+
+            $euroCoinRenderer = new EuroCoinTable($output);
+            $euroCoinRenderer->renderCoinsTable($purchasedTransaction->getChange());
+        }
     }
 }

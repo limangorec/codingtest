@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Machine;
+namespace App\Interfaces;
 
 /**
  * Interface PurchasableItemInterface
