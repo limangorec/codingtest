@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\Machine\PurchaseTransaction;
+use App\Machine\CigaretteMachine;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -31,26 +33,32 @@ class PurchaseCigarettesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $itemCount = (int) $input->getArgument('packs');
-        $amount = (float) \str_replace(',', '.', $input->getArgument('amount'));
+        try {
+            $itemCount = (int) $input->getArgument('packs');
+            $amount = (float) \str_replace(',', '.', $input->getArgument('amount'));
 
+            $transaction = new PurchaseTransaction();
+            $transaction->setPaidAmount($amount)
+                ->setItemQuantity($itemCount);
 
-        // $cigaretteMachine = new CigaretteMachine();
-        // ...
+            $cigaretteMachine = new CigaretteMachine();
+            $purchasedCigarette = $cigaretteMachine->execute($transaction);
+            $itemPrice = CigaretteMachine::ITEM_PRICE;
 
-        $output->writeln('You bought <info>...</info> packs of cigarettes for <info>...</info>, each for <info>...</info>. ');
-        $output->writeln('Your change is:');
+            $output->writeln(
+                'You bought <info>' . $purchasedCigarette->getItemQuantity() . '</info> packs of cigarettes ' .
+                'for <info>' . $purchasedCigarette->getTotalAmount() . '</info>, ' .
+                'each for <info>' . $itemPrice . '</info>.');
+            $output->writeln('Your change is:');
 
-        $table = new Table($output);
-        $table
-            ->setHeaders(array('Coins', 'Count'))
-            ->setRows(array(
-                // ...
-                array('0.02', '0'),
-                array('0.01', '0'),
-            ))
-        ;
-        $table->render();
-
+            $table = new Table($output);
+            $table
+                ->setHeaders(array('Coins', 'Count'))
+                ->setRows($purchasedCigarette->getChange())
+            ;
+            $table->render();
+        } catch (\Exception $e) {
+            $output->writeln('Error: ' . $e->getMessage());
+        }
     }
 }
