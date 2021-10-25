@@ -6,7 +6,12 @@
   },
   "autoload": {
     "psr-4": {
-      "App\\": "src/"
+      "App\\": "src/",
+      "Tests\\": "tests/"
     }
+  },
+  "require-dev": {
+    "symfony/phpunit-bridge": "^5.3",
+    "phpunit/phpunit": "^9.5"
   }
 }
