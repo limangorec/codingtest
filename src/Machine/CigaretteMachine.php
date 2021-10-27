@@ -30,10 +30,9 @@ class CigaretteMachine implements MachineInterface
     public function execute(PurchaseTransactionInterface $purchaseTransaction)
     {
         $nItemQuantity     = 0;
-        $nTransactionCosts = 0;
 
         $nTotalAmount = $purchaseTransaction->getItemQuantity() * CigaretteMachine::ITEM_PRICE;
-        if($nTransactionCosts <= $purchaseTransaction->getPaidAmount())
+        if($nTotalAmount <= $purchaseTransaction->getPaidAmount())
         {
             $nItemQuantity = $purchaseTransaction->getItemQuantity();
         }
