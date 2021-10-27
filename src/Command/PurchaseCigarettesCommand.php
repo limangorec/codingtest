@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Machine\CigaretteMachine;
-use App\Machine\CigarettePurchaseTransaction;
+use App\Machine\PurchaseTransactionInterface;
 
 /**
  * Class CigaretteMachine
@@ -37,7 +37,25 @@ class PurchaseCigarettesCommand extends Command
         $amount    = (float)\str_replace(',', '.', $input->getArgument('amount'));
 
         $cigaretteMachine             = new CigaretteMachine();
-        $cigarettePurchaseTransaction = new CigarettePurchaseTransaction($itemCount, $amount);
+        $cigarettePurchaseTransaction = new class($itemCount, $amount) implements PurchaseTransactionInterface{
+            private $m_nItemQuantity;
+            private $m_nPaidAmount;
+            public function __construct($itemCount, $amount)
+            {
+                $this->m_nItemQuantity = $itemCount;
+                $this->m_nPaidAmount   = $amount;
+            }
+
+            public function getItemQuantity()
+            {
+                return $this->m_nItemQuantity;
+            }
+
+            public function getPaidAmount()
+            {
+                return $this->m_nPaidAmount;
+            }
+        };
 
         $cigarettePurchasedItem = $cigaretteMachine->execute($cigarettePurchaseTransaction);
 

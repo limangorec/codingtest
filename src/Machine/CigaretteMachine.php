@@ -30,26 +30,48 @@ class CigaretteMachine implements MachineInterface
     public function execute(PurchaseTransactionInterface $purchaseTransaction)
     {
         $nItemQuantity     = 0;
-        $nTotalAmount      = 0;
         $nTransactionCosts = 0;
 
-        if($purchaseTransaction->isValid())
+        $nTotalAmount = $purchaseTransaction->getItemQuantity() * CigaretteMachine::ITEM_PRICE;
+        if($nTransactionCosts <= $purchaseTransaction->getPaidAmount())
         {
-            $nTotalAmount = $purchaseTransaction->getItemQuantity() * CigaretteMachine::ITEM_PRICE;
-            if($nTransactionCosts <= $purchaseTransaction->getPaidAmount())
-            {
-                $nItemQuantity = $purchaseTransaction->getItemQuantity();
-            }
-            else
-            {
-                $nTotalAmount = 0; // safer to not return anything instead of nr of items the customer didn't ask for -> TODO: check with product owner
-            }
+            $nItemQuantity = $purchaseTransaction->getItemQuantity();
+        }
+        else
+        {
+            $nTotalAmount = 0; // safer to not return anything instead of nr of items the customer didn't ask for -> TODO: check with product owner
         }
 
         $nBalance = $purchaseTransaction->getPaidAmount() - $nTotalAmount;
         $aChange  = $this->calculateChange($nBalance);
 
-        $cPurchasedItem = new CigarettePurchasedItem($nItemQuantity, $nTotalAmount, $aChange);
+        $cPurchasedItem = new class($nItemQuantity, $nTotalAmount, $aChange) implements PurchasedItemInterface
+        {
+            private $m_nItemQuantity = 0;
+            private $m_nTotalAmount  = 0;
+            private $m_aChange       = [];
+            public function __construct($nItemQuantity, $nTotalAmount, $aChange)
+            {
+                $this->m_nItemQuantity = $nItemQuantity;
+                $this->m_nTotalAmount  = $nTotalAmount;
+                $this->m_aChange       = $aChange;
+            }
+
+            public function getItemQuantity()
+            {
+                return $this->m_nItemQuantity;
+            }
+
+            public function getTotalAmount()
+            {
+                return $this->m_nTotalAmount;
+            }
+
+            public function getChange()
+            {
+                return $this->m_aChange;
+            }
+        };
 
         return $cPurchasedItem;
     }
@@ -65,7 +87,7 @@ class CigaretteMachine implements MachineInterface
                 if($nCount > 0)
                 {
                     $nBalance = $nBalance - ($nCount * $nCoin);
-                    array_push($aChange, [ number_format((float)$nCoin, 2, '.', ''), $nCount]);
+                    array_push($aChange, [number_format((float)$nCoin, 2, '.', ''), $nCount]);
                 }
             }
         }
