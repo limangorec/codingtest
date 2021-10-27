@@ -17,4 +17,9 @@ interface PurchaseTransactionInterface
      * @return float
      */
     public function getPaidAmount();
+
+    /**
+     * @return bool
+     */
+    public function isValid();
 }

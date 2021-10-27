@@ -7,6 +7,8 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use App\Machine\CigaretteMachine;
+use App\Machine\CigarettePurchaseTransaction;
 
 /**
  * Class CigaretteMachine
@@ -24,33 +26,28 @@ class PurchaseCigarettesCommand extends Command
     }
 
     /**
-     * @param InputInterface   $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return int|null|void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $itemCount = (int) $input->getArgument('packs');
-        $amount = (float) \str_replace(',', '.', $input->getArgument('amount'));
+        $itemCount = (int)$input->getArgument('packs');
+        $amount    = (float)\str_replace(',', '.', $input->getArgument('amount'));
 
+        $cigaretteMachine             = new CigaretteMachine();
+        $cigarettePurchaseTransaction = new CigarettePurchaseTransaction($itemCount, $amount);
 
-        // $cigaretteMachine = new CigaretteMachine();
-        // ...
+        $cigarettePurchasedItem = $cigaretteMachine->execute($cigarettePurchaseTransaction);
 
-        $output->writeln('You bought <info>...</info> packs of cigarettes for <info>...</info>, each for <info>...</info>. ');
+        $output->writeln('You bought <info>' . $cigarettePurchasedItem->getItemQuantity() . '</info> packs of cigarettes for <info>' . $cigarettePurchasedItem->getTotalAmount() . '</info>, each for <info>' . CigaretteMachine::ITEM_PRICE . '</info>. ');
         $output->writeln('Your change is:');
 
         $table = new Table($output);
         $table
             ->setHeaders(array('Coins', 'Count'))
-            ->setRows(array(
-                // ...
-                array('0.02', '0'),
-                array('0.01', '0'),
-            ))
-        ;
+            ->setRows($cigarettePurchasedItem->getChange());
         $table->render();
-
     }
 }
