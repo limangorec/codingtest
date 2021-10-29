@@ -3,7 +3,7 @@
 namespace App\Machine;
 
 /**
- * Interface PurchasableItemInterface
+ * Interface PurchaseTransactionInterface
  * @package App\Machine
  */
 interface PurchaseTransactionInterface
@@ -11,10 +11,10 @@ interface PurchaseTransactionInterface
     /**
      * @return integer
      */
-    public function getItemQuantity();
+    public function getItemQuantity(): int;
 
     /**
      * @return float
      */
-    public function getPaidAmount();
+    public function getPaidAmount(): float;
 }

@@ -3,7 +3,7 @@
 namespace App\Machine;
 
 /**
- * Interface CigaretteMachine
+ * Interface MachineInterface
  * @package App\Machine
  */
 interface MachineInterface
@@ -13,5 +13,5 @@ interface MachineInterface
      *
      * @return PurchasedItemInterface
      */
-    public function execute(PurchaseTransactionInterface $purchaseTransaction);
+    public function execute(PurchaseTransactionInterface $purchaseTransaction): PurchasedItemInterface;
 }
