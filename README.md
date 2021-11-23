@@ -3,7 +3,7 @@ Codingtest
 
 ### Setup
 System requirements:
-- PHP 5.6
+- PHP
 - Composer
 
 ### Intro
