@@ -29,4 +29,9 @@ interface PurchasedItemInterface
      * @return array
      */
     public function getChange();
+
+    /**
+     * @return float
+     */
+    public function getPrice();
 }
