@@ -2,6 +2,10 @@
 
 namespace App\Command;
 
+use App\Machine\ChangeMachine;
+use App\Machine\CigaretteMachine;
+use App\Machine\InsufficientCreditException;
+use App\Machine\PurchaseTransaction;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -34,23 +38,33 @@ class PurchaseCigarettesCommand extends Command
         $itemCount = (int) $input->getArgument('packs');
         $amount = (float) \str_replace(',', '.', $input->getArgument('amount'));
 
+        if($itemCount <= 0) {
+            $output->writeln('<error>You can\'t purchase a fewer than one Pack of cigs.</error>');
+            return 1;
+        }
 
-        // $cigaretteMachine = new CigaretteMachine();
-        // ...
+        $cigaretteMachine = new CigaretteMachine(new ChangeMachine());
+        $transaction = new PurchaseTransaction($itemCount, $amount);
+        try {
+            $purchase = $cigaretteMachine->execute($transaction);
+        } catch (InsufficientCreditException $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+            return 1;
+        }
 
-        $output->writeln('You bought <info>...</info> packs of cigarettes for <info>...</info>, each for <info>...</info>. ');
+        $output->writeln(sprintf(
+            'You bought <info>%s</info> packs of cigarettes for <info>%s</info>, each for <info>%s€</info>.',
+            $transaction->getItemQuantity(),
+            $transaction->getPaidAmount(),
+            CigaretteMachine::ITEM_PRICE
+        ));
+
         $output->writeln('Your change is:');
-
         $table = new Table($output);
         $table
             ->setHeaders(array('Coins', 'Count'))
-            ->setRows(array(
-                // ...
-                array('0.02', '0'),
-                array('0.01', '0'),
-            ))
+            ->setRows($purchase->getChange())
         ;
         $table->render();
-
     }
 }
